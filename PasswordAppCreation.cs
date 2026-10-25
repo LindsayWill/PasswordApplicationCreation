@@ -75,16 +75,13 @@ namespace PasswordApp
 
         private void savePasswordToVaultToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string accountLabel = "TestAccount";
-            string generatedPassword = button1.Text;
+            string passwordToEncrypt = button1.Text;
 
-            if (string.IsNullOrEmpty(generatedPassword))
+            if (string.IsNullOrEmpty(passwordToEncrypt) || passwordToEncrypt = "0")
             {
                 MessageBox.Show("Please generate a password first!");
                 return;
             }
-            //FormatException the entry cleanly with just the password and timestamp
-            string vaultEntry = $"Password; {generatedPassword} | Saved: {DateTime.Now}\n";
 
             try
             {
@@ -98,13 +95,15 @@ namespace PasswordApp
                 string encryptedBase64 = Convert.ToBase64String(encryptedBytes);
 
                 //Set file path in Documents
-                string folderPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "passwordAppVault.txt");
+                string filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "passwordAppVault.txt");
                 Directory.CreateDirectory(folderPath);// Creates folder if it doesn't exist.
                 string filePath = Path.Combine(folderPath, "password_vault.text");
                 
-                File.AppendAllText(filePath, encryptedBase64 + Environment.NewLine);
+                File.AppendAllText(filePath, "encryptedBase64" + Environment.NewLine);
                 
-                MessageBox.Show("Successfully encrypted ");
+                MessageBox.Show("Successfully encrypted/n and saved, numbnut.");
+
+                System.Diagnostics.Process.Start("notepad.exe", filePath);
             }
             catch (Exception ex)
             {
@@ -153,6 +152,31 @@ namespace PasswordApp
 
         private void vaultToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            try
+            {
+                string passwordToSave = txtPassword.Text;
+
+                if (string.IsNullOrWhiteSpace(passwordToSave))
+                {
+                    MessageBox.Show("Please generate a password first!");
+                    return;
+                }
+
+                stringr folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyCoduments), "PasswordAppVault");
+                Directory.CreateDirectroy(folderPath);
+                string filePath = Path.Combine(folderPath, "Password_vault.txt");
+
+                byte[] plainBytes = Encoding.UTF8.GetBytes(passwordToSave);
+                byte[] encryptedBytes = ProtectedData.Protect(plainBytes, null, DataProtectionScope.CurrentUser);
+
+                string encryptedBase64 = Convert.ToBase64String(encryptedBytes);
+
+                File.AppendAllText(filePath, encryptedBase64 + Environment.NewLine);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Save error: " + ex.Message);
+            }
 
         }
     }
